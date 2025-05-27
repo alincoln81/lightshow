@@ -90,12 +90,6 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('strobe-user', dataPoint);
     });
 
-    socket.on('stream-music', (songWave) => {
-        console.log('SERVER:STREAMING MUSIC', songWave);
-        // Broadcast to all users except the sender
-        socket.broadcast.emit('stream-music', songWave);
-    });
-
     socket.on('stop-light-show', () => {
         console.log('SERVER:STOPPING LIGHT SHOW');
         // Broadcast to all users except the sender
