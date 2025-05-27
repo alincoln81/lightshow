@@ -1,0 +1,193 @@
+[
+  {
+    "time": 0.07,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 8.069,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 9.195,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 9.381,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 10.809,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 11.61,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 11.947,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 11.958,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 12.794,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 12.817,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 12.829,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 13.642,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 13.92,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 15.36,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 18.344,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 22.477,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 24.915,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 25.066,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 26.366,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 27.063,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 27.504,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 27.609,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 27.62,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 27.632,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 27.643,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 28.491,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 29.083,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 29.106,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 29.896,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 31.045,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 31.057,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 31.068,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 32.206,
+    "action": "blackout_then_flash",
+    "color": "white"
+  },
+  {
+    "time": 34.052,
+    "action": "flash",
+    "intensity": 100,
+    "color": "white",
+    "duration": 200
+  },
+  {
+    "time": 34.215,
+    "action": "blackout_then_flash",
+    "color": "white"
+  }
+]

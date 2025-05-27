@@ -1,0 +1,199 @@
+.uk-card-default {
+  background: #262626;
+  border: 1px solid #2C2C2C;
+  color: #FFFFFF;
+  border-radius: 8px;
+}
+.uk-card-default .uk-card-title {
+  color: #FFFFFF;
+}
+.uk-card-default .uk-text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.uk-button {
+  border-radius: 6px;
+  padding: 0px 16px;
+}
+.uk-button-primary {
+  background: #D52265;
+  color: #FFFFFF;
+  border: 1px solid #2C2C2C;
+}
+.uk-button-primary:hover {
+  background: rgb(169.020242915, 26.979757085, 80.1457489879);
+  color: #FFFFFF;
+}
+.uk-button-danger {
+  background: #dc3545;
+  color: #FFFFFF;
+}
+.uk-button-danger:hover {
+  background: rgb(189.2151898734, 32.7848101266, 47.7721518987);
+  color: #FFFFFF;
+}
+
+.uk-grid {
+  margin-left: -20px;
+}
+.uk-grid > * {
+  padding-left: 20px;
+}
+
+.uk-container {
+  max-width: 1200px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.uk-text-success {
+  color: #28a745 !important;
+}
+
+.uk-text-danger {
+  color: #dc3545 !important;
+}
+
+.mdi {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.uk-form .uk-button-small, .uk-form-stacked .uk-button-small, .uk-form-controls .uk-button-small {
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  margin: 0 auto;
+  color: #FFFFFF;
+  background: #2C2C2C;
+  border: 1px solid #333333;
+  transition: all 0.2s ease-in-out;
+}
+.uk-form .uk-button-small:hover, .uk-form-stacked .uk-button-small:hover, .uk-form-controls .uk-button-small:hover {
+  background: rgb(18.5, 18.5, 18.5);
+}
+.uk-form .uk-button-small .mdi, .uk-form-stacked .uk-button-small .mdi, .uk-form-controls .uk-button-small .mdi {
+  font-size: 24px;
+  margin: 0;
+}
+
+.uk-select, .uk-input {
+  background: rgba(0, 0, 0, 0.1450980392);
+  color: #FFFFFF;
+  border: 1px solid rgba(197, 197, 197, 0.25);
+  border-radius: 6px;
+}
+.uk-select:focus, .uk-input:focus {
+  background: rgba(0, 0, 0, 0.062745098);
+  border-color: rgba(197, 197, 197, 0.5);
+}
+.uk-select:disabled, .uk-input:disabled {
+  background: rgba(0, 0, 0, 0.062745098);
+  border: 1px solid rgba(197, 197, 197, 0.25);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.uk-select:not([multiple]):not([size]) option {
+  background: #262626 !important;
+  background-color: #262626 !important;
+  color: #FFFFFF !important;
+}
+.uk-select:not([multiple]):not([size]) option:hover {
+  background: #D52265 !important;
+  background-color: #D52265 !important;
+}
+
+.uk-form-custom select {
+  background-color: #1b1b1b;
+  color: #C5C5C5;
+  border-color: #262626;
+}
+.uk-form-custom select:hover, .uk-form-custom select:focus {
+  background-color: #262626;
+  border-color: #2C2C2C;
+}
+.uk-form-custom::after {
+  border-color: #C5C5C5;
+}
+
+.uk-form-label {
+  color: #FFFFFF;
+}
+
+.uk-checkbox {
+  width: 38px;
+  height: 38px;
+  margin-top: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(197, 197, 197, 0.25);
+  background: rgba(0, 0, 0, 0.1450980392);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.uk-checkbox:checked {
+  border-color: #D52265;
+  background-color: #D52265;
+}
+.uk-checkbox:checked:focus {
+  background-color: #D52265;
+}
+
+html, body {
+  background-color: #1b1b1b;
+  color: #FFFFFF;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+hr {
+  border-color: #505050;
+}
+
+.uk-container {
+  padding: 20px 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+#logo-container {
+  margin: 20px auto;
+}
+#logo-container img {
+  width: 100px;
+  height: 100px;
+  margin-right: 10px;
+}
+#logo-container h1 {
+  font-size: 65px;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 600;
+  background: #AAAAAA;
+  background: linear-gradient(to bottom, #AAAAAA 0%, #FFFFFF 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#camera-card {
+  width: 100px;
+  height: 100px;
+  background-color: #1b1b1b;
+  border-radius: 6px;
+  border: 10px solid #1b1b1b;
+}
+
+#camera-feed {
+  border: 10px solid #1b1b1b;
+  border-radius: 6px;
+  height: auto;
+  background-color: #1b1b1b;
+}
+
+/*# sourceMappingURL=style.css.map */
