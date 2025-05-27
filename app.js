@@ -97,6 +97,17 @@ io.on('connection', (socket) => {
         //stop the music
         socket.broadcast.emit('stop-music');
     });
+
+    // Error handling
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
+        socket.emit('error', 'An error occurred');
+    });
+});
+
+// Error handling for the HTTP server
+http.on('error', (error) => {
+    console.error('Server error:', error);
 });
 
 // Start the server
