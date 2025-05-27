@@ -184,9 +184,9 @@ h1, h2, h3, h4, h5, h6 {
 #camera-card {
   width: 100px;
   height: 100px;
-  background-color: #1b1b1b;
+  background-color: transparent;
   border-radius: 6px;
-  border: 10px solid #1b1b1b;
+  border: 10px solid transparent;
 }
 
 #camera-feed {

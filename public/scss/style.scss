@@ -72,9 +72,9 @@ h1, h2, h3, h4, h5, h6 {
 #camera-card {
     width: 100px;
     height: 100px;
-    background-color: $gray-900;
+    background-color: transparent;
     border-radius: 6px;
-    border: 10px solid $gray-900;
+    border: 10px solid transparent;
 }
 
 #camera-feed {

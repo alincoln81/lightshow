@@ -39,22 +39,23 @@ socket.on('strobe-user', (dataPoint) => {
 
     console.log('USER: STROBBING', cameraFeed.style.borderColor, brightness, action);
 
-    //strobe the border color on and off every 100ms
-    //cameraFeed.style.borderColor = 'rgba(197, 197, 197, ' + brightness + ')';
-    cameraCard.style.borderColor = 'rgba(197, 197, 197, ' + brightness + ')';
-    //adjust the brightness of the flashlight if brightness is == 0 off and if brightness is == 100 on
-    
-    //adjust the brightness of the flashlight to the brightness value
-    
-    if (brightness == 0) {
-        currentTrack.applyConstraints({
-            advanced: [{ torch: false }]
-        });
-    } else if (brightness == 1) {
-        currentTrack.applyConstraints({
-            advanced: [{ torch: true }]
-        });
+    //if we have access to the flashlight, adjust the brightness otherwise just use the border color
+    if (currentTrack) {
+        //adjust the brightness of the flashlight to the brightness value
+        if (brightness == 0) {
+            currentTrack.applyConstraints({
+                advanced: [{ torch: false }]
+            });
+        } else if (brightness == 1) {
+            currentTrack.applyConstraints({
+                advanced: [{ torch: true }]
+            });
+        }
+    } else {
+        //strobe the border color on and off every 100ms
+        cameraCard.style.borderColor = 'rgba(197, 197, 197, ' + brightness + ')';
     }
+
 });
 
 socket.on('stop-light-show', () => {
