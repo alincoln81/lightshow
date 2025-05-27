@@ -51,11 +51,7 @@ socket.on('strobe-user', (dataPoint) => {
                 advanced: [{ torch: true }]
             });
         }
-    } else {
-        //strobe the border color on and off every 100ms
-        cameraCard.style.borderColor = 'rgba(197, 197, 197, ' + brightness + ')';
-    }
-
+    } 
 });
 
 socket.on('stop-light-show', () => {
