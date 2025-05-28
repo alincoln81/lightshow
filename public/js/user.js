@@ -1,3 +1,6 @@
+const SEEN_ONCE_QUERY = 'timetoshine=1';
+const has_seen_once = location.search.indexOf(SEEN_ONCE_QUERY) !== -1;
+
 // Connection status elements
 const startCameraBtn = document.getElementById('start-camera-btn'); //to start the camera and flashlight
 const stopCameraBtn = document.getElementById('stop-camera-btn'); //to stop the camera and flashlight
@@ -6,12 +9,18 @@ const body = document.getElementById('body'); //for the background color
 // Initialize Socket.IO
 const socket = io();
 
+if (has_seen_once) {
+  // OR: "Tap again, Yours truly, Android Police."
+  startCameraBtn.innerText = "Tap to Begin";
+}
+
 //Variables
 let currentStream = null;
 let currentTrack = null;
 let flashlight = null;
 let participatingInLightShow = false;
 let redirectUrl = null;
+
 // ===================================================================================================================================================
 // Socket event handlers
 socket.on('connect', () => {
@@ -81,6 +90,22 @@ async function startCameraAndFlashlight() {
         // Store the stream and track for later use
         currentStream = stream;
         currentTrack = stream.getVideoTracks()[0];
+
+        const has_torch = currentTrack?.getCapabilities().torch;
+
+        if (!has_torch) {
+
+          if (!has_seen_once) {
+            // CUT - again - with the lights!
+            const separator = location.href.indexOf('?') === -1 ? '?' : '&';
+            location.href = `${location.href}${separator}${SEEN_ONCE_QUERY}`;
+            return;
+          } else {
+            // This just ain't gonna work
+            // TODO: - something different.
+          }
+        }
+
         // Set up camera feed
         cameraFeed.srcObject = stream;
 
