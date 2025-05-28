@@ -48,63 +48,65 @@ socket.on('strobe-user', (dataPoint) => {
 
 socket.on('pulse-user', () => {
     let brightness = 0;
-    let torchState = 'up';
+    let torchState = true;
     //Set an interval to pulse the flashlight and camera border on and off every 400ms
     pulseInterval = setInterval(() => {
-        if (torchState == 'up') {
+        
+
+        if (flashlight && currentTrack) {
+            try {
+                const capabilities = currentTrack.getCapabilities();
+                if (capabilities.torchLevel) {
+                    currentTrack.applyConstraints({
+                        advanced: [
+                            {torch: torchState},
+                            {torchLevel: brightness}  // Value between 0.0 and 1.0
+                        ]
+                    });
+                } else {
+                    // Fallback to basic torch control if brightness control is not supported
+                    currentTrack.applyConstraints({
+                        advanced: [{torch: torchState}]
+                    });
+                }
+            } catch (error) {
+                console.warn('Error setting torch brightness:', error);
+                // Fallback to basic torch control
+                currentTrack.applyConstraints({
+                    advanced: [{torch: torchState}]
+                });
+            }
+        } else {
+            cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+        }
+
+
+        
+        if (torchState == true) {
             
             console.log('USER: PULSE INTERVAL',  
                 'torchState:', torchState, 
                 'brightness:', brightness
             );
 
-
-            if (flashlight && currentTrack) {
-                try {
-                    const capabilities = currentTrack.getCapabilities();
-                    if (capabilities.torchLevel) {
-                        currentTrack.applyConstraints({
-                            advanced: [
-                                {torch: true},
-                                {torchLevel: brightness}  // Value between 0.0 and 1.0
-                            ]
-                        });
-                    } else {
-                        // Fallback to basic torch control if brightness control is not supported
-                        currentTrack.applyConstraints({
-                            advanced: [{torch: true}]
-                        });
-                    }
-                } catch (error) {
-                    console.warn('Error setting torch brightness:', error);
-                    // Fallback to basic torch control
-                    currentTrack.applyConstraints({
-                        advanced: [{torch: true}]
-                    });
-                }
-            } else {
-                cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
-            }
-
             brightness += 0.025;
 
             if (brightness > 1) {
                 brightness = 1;
-                torchState = 'down';
+                torchState = false;
             }
 
-        } else if (torchState == 'down') {
+        } else if (torchState == false) {
             console.log('USER: PULSE INTERVAL',  
                 'torchState:', torchState, 
                 'brightness:', brightness
             );
 
-            cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
             brightness -= 0.025;
 
             if (brightness < 0) {
                 brightness = 0;
-                torchState = 'up';
+                torchState = true;
             }
         }
     }, 50);
