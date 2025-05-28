@@ -3,10 +3,18 @@
 
 // Card overrides
 .uk-card-default {
-    background: $gray-800;
-    border: 1px solid $gray-700;
+    background: transparent;
+    border: none;
     color: $text-color;
     border-radius: 8px;
+    box-shadow: none;
+
+    &-primary {
+        background: $gray-800;
+        border: 1px solid $gray-700;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+    }
 
     .uk-card-title {
         color: $text-color;
@@ -16,6 +24,7 @@
         color: rgba($text-color, 0.6) !important;
     }
 }
+
 
 // Button overrides
 .uk-button {

@@ -60,7 +60,7 @@ async function startLightShow() {
 
     //strobe the flashlight and camera border on and off every 100ms
     strobeInterval = setInterval(() => {
-        socket.emit('strobe', {brightness: 100, action: 'strobe'});
+        socket.emit('strobe', {brightness: 1, action: 'strobe'});
         setTimeout(() => {
             socket.emit('strobe', {brightness: 0, action: 'strobe'});
         }, 50);

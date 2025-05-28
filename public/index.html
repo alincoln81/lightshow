@@ -29,18 +29,11 @@
 
         <div class="uk-card uk-card-default uk-card-body uk-margin">
             
-            <!-- Camera Card -->
-            <div id="camera-card" class="uk-margin uk-margin-auto">
-                <div class="uk-margin uk-flex uk-flex-center uk-flex-middle">
-                    <video id="camera-feed" autoplay playsinline style="max-width: 10%; display: none; opacity: 0;"></video>
-                </div>
-            </div>
-
             <!-- Camera Controls Card -->
             <div class="uk-margin-auto uk-flex uk-flex-center uk-flex-middle uk-margin-bottom">
                 <button class="uk-button uk-button-primary" id="start-camera-btn">
                     <span class="mdi mdi-camera"></span>
-                    Start Camera & Flashlight
+                    Start Camera to allow Flashlight
                 </button>
                 <button class="uk-button uk-button-danger" id="stop-camera-btn" style="display: none;">
                     <span class="mdi mdi-camera-off"></span>
@@ -48,13 +41,24 @@
                 </button>
             </div>
 
+            <!-- Camera Card -->
+            <div id="camera-card" class="uk-margin uk-margin-auto">
+                <div class="uk-margin uk-flex uk-flex-center uk-flex-middle">
+                    <video id="camera-feed" autoplay playsinline style="max-width: 10%; opacity: 0;"></video>
+                </div>
+            </div>
+
+            
+
             <!-- Connection Status Card -->
+             <!--
             <div class="uk-margin-auto uk-flex uk-flex-center uk-flex-middle uk-text-center">
                 <div id="connection-status" class="uk-text-danger">
                     <span class="mdi mdi-circle"></span>
                     Disconnected
                 </div>
             </div>
+            -->
         </div>
     </div>
 
