@@ -11,6 +11,32 @@ module.exports = {
       const vuIndex = context.vars.vu || Math.floor(Math.random() * 1000);
       const delayMs = (vuIndex % 10) * 100; // 0–900 ms in 100-ms steps
       setTimeout(done, delayMs);
+    },
+
+    beforeScenario: function(context, events, done) {
+      console.log(`Starting new virtual user session`);
+      return done();
+    },
+
+    afterScenario: function(context, events, done) {
+      console.log(`Virtual user session completed with status: ${context.vars.response || 'no response'}`);
+      return done();
+    },
+
+    beforeRequest: function(requestParams, context, events, done) {
+      console.log(`Attempting to connect with params:`, requestParams);
+      return done();
+    },
+
+    afterResponse: function(requestParams, response, context, events, done) {
+      if (response.statusCode !== 200) {
+        console.error(`Error response:`, {
+          statusCode: response.statusCode,
+          body: response.body,
+          headers: response.headers
+        });
+      }
+      return done();
     }
   };
   

@@ -51,20 +51,28 @@ socket.on('flashlight-count-update', (count) => {
 // ===================================================================================================================================================
 // Start Light Show
 async function startLightShow() {
-    console.log('Starting light show');
+    //console.log('Starting light show');
     startLightShowBtn.style.display = 'none';
     stopLightShowBtn.style.display = 'block';
 
-    console.log('Starting strobe mode');
-    socket.emit('start-strobe-mode');
+    //get the light show mode
+    const lightShowMode = document.getElementById('light-show-mode').value;
+    console.log('Light show mode', lightShowMode);
 
-    //strobe the flashlight and camera border on and off every 100ms
-    strobeInterval = setInterval(() => {
-        socket.emit('strobe', {brightness: 1, action: 'strobe'});
-        setTimeout(() => {
-            socket.emit('strobe', {brightness: 0, action: 'strobe'});
-        }, 50);
-    }, 150);
+    if (lightShowMode === 'strobe') {
+        //strobe the flashlight and camera border on and off every 100ms
+        strobeInterval = setInterval(() => {
+            socket.emit('strobe', {brightness: 1, action: 'strobe'});
+            setTimeout(() => {
+                socket.emit('strobe', {brightness: 0, action: 'strobe'});
+            }, 50);
+        }, 150);
+    } else if (lightShowMode === 'pulse') {
+        //pulse the flashlight and camera border on and off every 400ms
+        socket.emit('pulse', {brightness: 1, action: 'pulse'});
+    } else {
+        console.log('Invalid light show mode');
+    }
 }
 // stop light show
 function stopLightShow() {

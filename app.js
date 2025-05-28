@@ -22,10 +22,11 @@ let connectedUsers = new Set();
 let connectedFlashlights = new Set();
 let producerConnected = false;
 let producerSocket = null;
+let state = null;
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-    console.log('New connection:', socket.id);
+    //console.log('New connection:', socket.id);
 
     // Handle producer connection
     socket.on('producer-connect', () => {
@@ -58,7 +59,10 @@ io.on('connection', (socket) => {
         if (producerSocket) {
             producerSocket.emit('user-count-update', connectedUsers.size);
         }
-        console.log('User connected. Total users:', connectedUsers.size);
+        //console.log('User connected. Total users:', connectedUsers.size);
+        if (state) {
+            socket.emit('state-update', state);
+        }
     });
 
     // Handle disconnection
@@ -72,30 +76,39 @@ io.on('connection', (socket) => {
             if (producerSocket) {
                 producerSocket.emit('user-count-update', connectedUsers.size);
             }
-            console.log('User disconnected. Total users:', connectedUsers.size);
+            //console.log('User disconnected. Total users:', connectedUsers.size);
         }
         if (connectedFlashlights.has(socket.id)) {
             connectedFlashlights.delete(socket.id);
             if (producerSocket) {
                 producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
             }
-            console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
+            //console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
         }
     });
 
     // Handle light show start
     socket.on('strobe', (dataPoint) => {
-        console.log('SERVER:STROBBING', dataPoint);
+        //console.log('SERVER:STROBBING', dataPoint);
         // Broadcast to all users except the sender
         socket.broadcast.emit('strobe-user', dataPoint);
+        state = dataPoint;
+    });
+
+    socket.on('pulse', (dataPoint) => {
+        //console.log('SERVER:PULSING', dataPoint);
+        // Broadcast to all users except the sender
+        socket.broadcast.emit('pulse-user');
+        state = dataPoint;
     });
 
     socket.on('stop-light-show', () => {
-        console.log('SERVER:STOPPING LIGHT SHOW');
+        //console.log('SERVER:STOPPING LIGHT SHOW');
         // Broadcast to all users except the sender
         socket.broadcast.emit('stop-light-show');
         //stop the music
         socket.broadcast.emit('stop-music');
+        state = null;
     });
 
     // Error handling

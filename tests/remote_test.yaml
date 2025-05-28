@@ -1,11 +1,11 @@
 config:
-  target: "http://localhost:3000"
+  target: "https://lightshow.onrender.com"
   phases:
     # Phase 1 ─ ramp-up: 50 VU/s
     - name: "ramp-up"
-      arrivalRate: 100        # users per second
-      maxVusers: 1000         # stop when we hit 1 000
-      duration: 10            # 1000 ÷ 100 = 10 s
+      arrivalRate: 50         # users every second
+      maxVusers: 1000         # stop when we hit 1000
+      duration: 20            # 1000 ÷ 50 = 20 seconds
 
   engines:
     socketio: {}              # use Socket.IO transport
