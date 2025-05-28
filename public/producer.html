@@ -83,9 +83,6 @@
                 <div class="uk-width-expand">
                     <input type="text" id="redirect-url" class="uk-input" placeholder="Redirect URL">
                 </div>
-                <div class="uk-width-auto">
-                    <button class="uk-button uk-button-primary" id="save-redirect-url-btn">Save</button>
-                </div>
             </div>
 
             <!-- Select the light show mode -->
@@ -96,9 +93,16 @@
                 </select>
             </div>
 
-            <div class="uk-margin-top">
-                <button class="uk-button uk-button-primary" id="start-light-show-btn">Start Light Show</button>
-                <button class="uk-button uk-button-danger" id="stop-light-show-btn" style="display: none;">Stop Light Show</button>
+            <div class="uk-margin-top uk-grid uk-grid-small" uk-grid>
+                <div id="start" class="uk-width-auto">
+                    <button class="uk-button uk-button-primary" id="start-light-show-btn">Start Light Show</button>
+                </div>
+                <div id="pause" class="uk-width-auto">
+                    <button class="uk-button uk-button-danger" id="pause-light-show-btn" style="display: none;">Pause Light Show</button>
+                </div>
+                <div id="stop" class="uk-width-auto">
+                    <button class="uk-button uk-button-danger" id="stop-light-show-btn" style="display: none;">Stop Light Show</button>
+                </div>
             </div>
         </div>
 

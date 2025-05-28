@@ -109,6 +109,12 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('stop-light-show');
     });
 
+    socket.on('pause-light-show', () => {
+        console.log('SERVER:PAUSING LIGHT SHOW');
+        // Broadcast to all users except the sender
+        socket.broadcast.emit('pause-light-show');
+    });
+
     socket.on('save-redirect-url', (url) => {
         console.log('SERVER:SAVING REDIRECT URL', url);
         // Broadcast to all users except the sender
