@@ -5,6 +5,7 @@ const startCameraBtn = document.getElementById('start-camera-btn');
 const stopCameraBtn = document.getElementById('stop-camera-btn');
 const cameraFeed = document.getElementById('camera-feed');
 const cameraCard = document.getElementById('camera-card');
+const body = document.getElementById('body');
 
 let currentStream = null;
 let currentTrack = null;
@@ -42,7 +43,8 @@ socket.on('strobe-user', (dataPoint) => {
             });
         }
     } else {
-        cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+        //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+        body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
     }
 });
 
@@ -77,7 +79,8 @@ socket.on('pulse-user', () => {
                 });
             }
         } else {
-            cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+            //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
 
 
@@ -114,7 +117,8 @@ socket.on('pulse-user', () => {
 
 socket.on('stop-light-show', () => {
     //console.log('USER: STOPPING LIGHT SHOW');
-    cameraCard.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+    //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+    body.style.backgroundColor = '#1b1b1b';
     if (pulseInterval) {
         clearInterval(pulseInterval);
     }
