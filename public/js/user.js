@@ -1,79 +1,75 @@
-//console.log('User.js loaded');
-
 // Connection status elements
-const startCameraBtn = document.getElementById('start-camera-btn');
-const stopCameraBtn = document.getElementById('stop-camera-btn');
-const cameraFeed = document.getElementById('camera-feed');
-const cameraCard = document.getElementById('camera-card');
-const body = document.getElementById('body');
-const cameraCardTitle = document.getElementById('camera-card-title');
-
-let currentStream = null;
-let currentTrack = null;
-let flashlight = null;
-let pulseInterval = null;
-
-let currentAction = null;
-
+const startCameraBtn = document.getElementById('start-camera-btn'); //to start the camera and flashlight
+const stopCameraBtn = document.getElementById('stop-camera-btn'); //to stop the camera and flashlight
+const cameraFeed = document.getElementById('camera-feed'); //for the camera feed
+const infoText = document.getElementById('info-text'); //to indicate when the show has started
+const infoText2 = document.getElementById('info-text2'); //to indicate when the show has ended
+const body = document.getElementById('body'); //for the background color
 // Initialize Socket.IO
 const socket = io();
 
+//Variables
+let currentStream = null;
+let currentTrack = null;
+let flashlight = null;
+let participatingInLightShow = false;
+let redirectUrl = null;
+// ===================================================================================================================================================
 // Socket event handlers
 socket.on('connect', () => {
     socket.emit('user-connect');
 });
 
-socket.on('state-update', (state) => {
-    console.log('USER: STATE UPDATE', state);
-    currentAction = state.action;
-    //if state.action == 'pulse' then we need to start the pulse interval
-    console.log('Current Action:', currentAction);
-
-    //if currentAction == 'pulse' then we need to start the pulse interval
-    if (currentAction == 'pulse') {
-        startPulseInterval();
-    }
+socket.on('redirect-url', (url) => {
+    redirectUrl = url;
 });
 
-socket.on('disconnect', () => {
-});
-
-// Store timeout IDs
-socket.on('strobe-user', (dataPoint) => {
-    let brightness = dataPoint.brightness;
-    //if we have access to the flashlight, adjust the brightness otherwise just use the border color
-    if (flashlight && currentTrack) {
-        //adjust the brightness of the flashlight to the brightness value
-        if (brightness == 0) {
-            currentTrack.applyConstraints({
-                advanced: [{ torch: false }]
-            });
-        } else if (brightness == 1) {
-            currentTrack.applyConstraints({
-                advanced: [{torch: true}]
-            });
+socket.on('start-light-show', (dataPoint) => {
+    infoText2.style.display = 'none';
+    if (participatingInLightShow) {
+        let brightness = dataPoint.brightness;
+        //if we have access to the flashlight, adjust the brightness otherwise just use the border color
+        if (flashlight && currentTrack) {
+            //adjust the brightness of the flashlight to the brightness value
+            if (brightness == 0) {
+                currentTrack.applyConstraints({
+                    advanced: [{ torch: false }]
+                });
+            } else if (brightness == 1) {
+                currentTrack.applyConstraints({
+                    advanced: [{torch: true}]
+                });
+            }
+        } else {
+            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
+        infoText.innerHTML = '';
     } else {
-        body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+        infoText.innerHTML = 'The light show has started! Click the button above to join in!';
     }
-});
-
-socket.on('pulse-user', () => {
-    startPulseInterval();
 });
 
 socket.on('stop-light-show', () => {
-    //console.log('USER: STOPPING LIGHT SHOW');
-    body.style.backgroundColor = '#1b1b1b';
-    if (pulseInterval) {
-        clearInterval(pulseInterval);
+    console.log('USER: PRODUCER STOPPED LIGHT SHOW');
+    //call the stopCameraAndFlashlight function
+    stopCameraAndFlashlight();
+    //redirect to the redirect URL
+    if (redirectUrl) {
+        // Ensure the URL has a protocol
+        const redirectUrlWithProtocol = redirectUrl.startsWith('http://') || redirectUrl.startsWith('https://') 
+            ? redirectUrl 
+            : `https://${redirectUrl}`;
+        window.location.href = redirectUrlWithProtocol;
+    } else {
+        console.log('USER: NO REDIRECT URL');
     }
-    cameraCardTitle.style.display = 'none';
+
 });
 
+// ===================================================================================================================================================
 // Camera and flashlight handling
 async function startCameraAndFlashlight() {
-
+    participatingInLightShow = true;
     try {
         // Request camera and flashlight permissions
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -84,51 +80,24 @@ async function startCameraAndFlashlight() {
                 }]
             }
         });
-
         // Store the stream and track for later use
         currentStream = stream;
         currentTrack = stream.getVideoTracks()[0];
-
         // Set up camera feed
         cameraFeed.srcObject = stream;
 
         // Try to enable flashlight
-        if (currentTrack.getCapabilities().torch) {
-            try {
-                const capabilities = currentTrack.getCapabilities();
-                if (capabilities.torchLevel) {
-                    await currentTrack.applyConstraints({
-                        advanced: [
-                            {torch: true},
-                            {torchLevel: 1.0}  // Value between 0.0 and 1.0
-                        ]
-                    });
-                } else {
-                    // Fallback to basic torch control if brightness control is not supported
-                    await currentTrack.applyConstraints({
-                        advanced: [{torch: true}]
-                    });
-                }
-                socket.emit('flashlight-connect');
-                flashlight = true;
-            } catch (error) {
-                console.warn('Error setting initial torch brightness:', error);
-                // Fallback to basic torch control
-                await currentTrack.applyConstraints({
-                    advanced: [{torch: true}]
-                });
-                socket.emit('flashlight-connect');
-                flashlight = true;
-            }
-        } else {
-            console.warn('Flashlight not found');
-            flashlight = false;
-        }
+        try {
+            await currentTrack.applyConstraints({
+                advanced: [{torch: false},]
+            });
+            socket.emit('flashlight-connect');
+            updateUI('success');
 
-        // Update button states
-        startCameraBtn.style.display = 'none';
-        stopCameraBtn.style.display = 'inline-block';
-        cameraCardTitle.style.display = 'none';
+        } catch (error) {
+            console.warn('Flashlight not found:', error);
+            updateUI('flashlight-failed');
+        }
 
     } catch (error) {
         if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
@@ -136,11 +105,12 @@ async function startCameraAndFlashlight() {
         } else {
             console.warn('Error accessing camera:', error);
         }
+        updateUI('camera-failed');
     }
-    socket.emit('get-state');
 }
 
 function stopCameraAndFlashlight() {
+    participatingInLightShow = false;
     if (currentStream) {
         // Stop all tracks
         currentStream.getTracks().forEach(track => {
@@ -151,24 +121,28 @@ function stopCameraAndFlashlight() {
         socket.emit('flashlight-disconnect');
     }
 
-    if (pulseInterval) {
-        clearInterval(pulseInterval);
-    }
-
-    if (currentAction == 'pulse') {
-        cameraCardTitle.style.display = 'block';
-    } else {
-        cameraCardTitle.style.display = 'none';
-    }
     body.style.backgroundColor = '#1b1b1b';
-    // Clear video source
     cameraFeed.srcObject = null;
-
+    flashlight = null;
     // Reset button states
     startCameraBtn.style.display = 'inline-block';
     stopCameraBtn.style.display = 'none';
 }
+// ===================================================================================================================================================
+// UI update
+function updateUI(state) {
+    
+    startCameraBtn.style.display = 'none';
+    stopCameraBtn.style.display = 'inline-block';
 
+    if (state == 'success') {
+        flashlight = true;
+    } else if (state == 'camera-failed' || state == 'flashlight-failed') {
+        flashlight = false;
+    }
+}
+// ===================================================================================================================================================
+// Pulse interval
 function startPulseInterval() {
     console.log('USER: STARTING PULSE INTERVAL');
 
@@ -231,7 +205,7 @@ function startPulseInterval() {
         console.log('USER: NO FLASHLIGHT OR TRACK');
     }
 }
-
+// ===================================================================================================================================================
 // Button handlers
 startCameraBtn.addEventListener('click', startCameraAndFlashlight);
 stopCameraBtn.addEventListener('click', stopCameraAndFlashlight);

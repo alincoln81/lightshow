@@ -1,8 +1,10 @@
+import { connections } from './db.js';
+
+console.log('Producer.js loaded');
 // ===================================================================================================================================================
 const startLightShowBtn = document.getElementById('start-light-show-btn');
 const stopLightShowBtn = document.getElementById('stop-light-show-btn');
-const saveRedirectUrlBtn = document.getElementById('save-redirect-url-btn');
-let flashInterval;
+let strobeInterval;
 // ===================================================================================================================================================
 // Initialize Socket.IO with reconnection settings
 const socket = io({
@@ -33,11 +35,15 @@ socket.on('producer-error', (message) => {
 });
 
 socket.on('user-count-update', (count) => {
+    console.log('User count update', count);
+    connections.users = count;
     document.getElementById('user-count').innerHTML = count;
     document.getElementById('last-updated').innerHTML = new Date().toLocaleString();
 });
 
 socket.on('flashlight-count-update', (count) => {
+    console.log('Flashlight count update', count);
+    connections.flashlights = count;
     document.getElementById('flashlight-count').innerHTML = count;
     document.getElementById('last-updated').innerHTML = new Date().toLocaleString();
 });
@@ -45,54 +51,41 @@ socket.on('flashlight-count-update', (count) => {
 // ===================================================================================================================================================
 // Start Light Show
 async function startLightShow() {
-    //hide the start light show button and show the stop light show button
+    //console.log('Starting light show');
     startLightShowBtn.style.display = 'none';
     stopLightShowBtn.style.display = 'block';
 
     //get the light show mode
     const lightShowMode = document.getElementById('light-show-mode').value;
-    
-    //set the light show interval based on the light show mode
-    let lightShowInterval;
+    console.log('Light show mode', lightShowMode);
+
     if (lightShowMode === 'strobe') {
-        lightShowInterval = 100;
+        //strobe the flashlight and camera border on and off every 100ms
+        strobeInterval = setInterval(() => {
+            socket.emit('strobe', {brightness: 1, action: 'strobe'});
+            setTimeout(() => {
+                socket.emit('strobe', {brightness: 0, action: 'strobe'});
+            }, 50);
+        }, 150);
     } else if (lightShowMode === 'pulse') {
-        lightShowInterval = 6000;
+        //pulse the flashlight and camera border on and off every 400ms
+        socket.emit('pulse', {brightness: 1, action: 'pulse'});
     } else {
-        //if the light show mode is not valid, return
         console.log('Invalid light show mode');
-        return;
     }
-
-    // Function to emit the light show events
-    const emitLightShow = () => {
-        socket.emit('start-light-show', {brightness: 1, action: 'pulse'});
-        setTimeout(() => {
-            socket.emit('start-light-show', {brightness: 0, action: 'pulse'});
-        }, lightShowInterval/2);
-    };
-
-    // Emit immediately
-    emitLightShow();
-    
-    // Then set up the interval for subsequent emissions
-    flashInterval = setInterval(emitLightShow, lightShowInterval);
 }
 // stop light show
 function stopLightShow() {
+    console.log('Stopping light show');
     startLightShowBtn.style.display = 'block';
     stopLightShowBtn.style.display = 'none';
-    clearInterval(flashInterval);
+    clearInterval(strobeInterval);
     socket.emit('stop-light-show');
 }
-
-function saveRedirectUrl() {
-    const redirectUrl = document.getElementById('redirect-url').value;
-    socket.emit('save-redirect-url', redirectUrl);
-}
-
-// add event listeners
+// add event listener to the start light show button
 startLightShowBtn.addEventListener('click', () => {startLightShow();});
+// add event listener to the stop light show button
 stopLightShowBtn.addEventListener('click', () => {stopLightShow();});
-saveRedirectUrlBtn.addEventListener('click', () => {saveRedirectUrl();});
 // ===================================================================================================================================================
+
+

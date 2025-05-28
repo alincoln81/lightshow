@@ -22,6 +22,7 @@ let connectedUsers = new Set();
 let connectedFlashlights = new Set();
 let producerConnected = false;
 let producerSocket = null;
+let state = null;
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -83,36 +84,34 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('flashlight-connect', () => {
-        connectedFlashlights.add(socket.id);
-        if (producerSocket) {
-            producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
+    socket.on('get-state', () => {
+        if (state) {
+            socket.emit('state-update', state);
         }
     });
 
-    socket.on('flashlight-disconnect', () => {
-        connectedFlashlights.delete(socket.id);
-        if (producerSocket) {
-            producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
-        }
+    // Handle light show start
+    socket.on('strobe', (dataPoint) => {
+        //console.log('SERVER:STROBBING', dataPoint);
+        // Broadcast to all users except the sender
+        socket.broadcast.emit('strobe-user', dataPoint);
+        state = dataPoint;
     });
 
-    socket.on('start-light-show', (dataPoint) => {
+    socket.on('pulse', (dataPoint) => {
         //console.log('SERVER:PULSING', dataPoint);
         // Broadcast to all users except the sender
-        socket.broadcast.emit('start-light-show', dataPoint);
+        socket.broadcast.emit('pulse-user');
+        state = dataPoint;
     });
 
     socket.on('stop-light-show', () => {
-        console.log('SERVER:STOPPING LIGHT SHOW');
+        //console.log('SERVER:STOPPING LIGHT SHOW');
         // Broadcast to all users except the sender
         socket.broadcast.emit('stop-light-show');
-    });
-
-    socket.on('save-redirect-url', (url) => {
-        console.log('SERVER:SAVING REDIRECT URL', url);
-        // Broadcast to all users except the sender
-        socket.broadcast.emit('redirect-url', url);
+        //stop the music
+        socket.broadcast.emit('stop-music');
+        state = null;
     });
 
     // Error handling

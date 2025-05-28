@@ -33,24 +33,33 @@
             <div class="uk-margin-auto uk-flex uk-flex-center uk-flex-middle uk-margin-bottom">
                 <button class="uk-button uk-button-primary" id="start-camera-btn">
                     <span class="mdi mdi-camera"></span>
-                    Join Light Show
+                    Start Camera to allow Flashlight
                 </button>
                 <button class="uk-button uk-button-danger" id="stop-camera-btn" style="display: none;">
                     <span class="mdi mdi-camera-off"></span>
-                    Leave Light Show
+                    Stop Camera & Flashlight
                 </button>
             </div>
 
             <!-- Camera Card -->
             <div id="camera-card" class="uk-margin-remove">
-                <h2 id="info-text" class="uk-text-center uk-margin-large-top"></h2>
-                <h2 id="info-text2" class="uk-text-center uk-margin-large-top" style="display: none;">
-                    The light show has ended! Thank you for participating!
-                </h2>
+                <h2 id="camera-card-title" class="uk-text-center" style="display: none;">The show has started, please click the button above to join in on the fun!</h2>
                 <div class="uk-margin uk-flex uk-flex-center uk-flex-middle">
                     <video id="camera-feed" autoplay playsinline style="max-width: 10%; opacity: 0;"></video>
                 </div>
             </div>
+
+            
+
+            <!-- Connection Status Card -->
+             <!--
+            <div class="uk-margin-auto uk-flex uk-flex-center uk-flex-middle uk-text-center">
+                <div id="connection-status" class="uk-text-danger">
+                    <span class="mdi mdi-circle"></span>
+                    Disconnected
+                </div>
+            </div>
+            -->
         </div>
     </div>
 
