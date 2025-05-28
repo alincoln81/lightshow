@@ -25,7 +25,7 @@ socket.on('disconnect', () => {
 socket.on('strobe-user', (dataPoint) => {
     let brightness = dataPoint.brightness;
     //if we have access to the flashlight, adjust the brightness otherwise just use the border color
-    if (currentTrack) {
+    if (flashlight && currentTrack) {
         //adjust the brightness of the flashlight to the brightness value
         if (brightness == 0) {
             currentTrack.applyConstraints({
@@ -111,46 +111,5 @@ function stopCameraAndFlashlight() {
 }
 
 // Button handlers
-startCameraBtn.addEventListener('click', accessFlashlight);
+startCameraBtn.addEventListener('click', startCameraAndFlashlight);
 stopCameraBtn.addEventListener('click', stopCameraAndFlashlight);
-
-
-let on = false;
-
-
-function accessFlashlight() {
-//Test browser support
-    if (!('mediaDevices' in window.navigator)) {
-        alert("Media Devices not available");
-        return;
-    };
-
-    //Get the environment camera (usually the second one)
-    window.navigator.mediaDevices.enumerateDevices().then((devices) => {
-
-        const cameras = devices.filter((device) => device.kind === 'videoinput');
-        if (cameras.length === 0) {
-            alert("No camera found. If your device has camera available, check permissions.");
-            return;
-        };
-        
-        const camera = cameras[cameras.length - 1];
-        
-        window.navigator.mediaDevices.getUserMedia({
-            video: {
-                deviceId: camera.deviceId
-            }
-        }).then((stream) => {
-            currentTrack = stream.getVideoTracks()[0];
-            
-            startCameraBtn.style.display = 'none';
-            startCameraBtn.innerHTML = 'Start Camera to allow Flashlight';
-            stopCameraBtn.style.display = 'inline-block';
-            //check if the camera has a torch   
-            if (!(currentTrack.getCapabilities().torch)) {
-                //alert("No torch available.");
-                location.href = location.href.indexOf('?') !== -1 ? location.href + '&ok=true' : location.href + '?ok=true'
-            }
-        });
-    });
-}
