@@ -60,9 +60,6 @@ io.on('connection', (socket) => {
             producerSocket.emit('user-count-update', connectedUsers.size);
         }
         //console.log('User connected. Total users:', connectedUsers.size);
-        if (state) {
-            socket.emit('state-update', state);
-        }
     });
 
     // Handle disconnection
@@ -84,6 +81,12 @@ io.on('connection', (socket) => {
                 producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
             }
             //console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
+        }
+    });
+
+    socket.on('get-state', () => {
+        if (state) {
+            socket.emit('state-update', state);
         }
     });
 

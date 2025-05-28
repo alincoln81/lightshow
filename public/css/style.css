@@ -159,6 +159,15 @@ hr {
   border-color: #505050;
 }
 
+#camera-card-title {
+  font-size: 30px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 40px auto 0px auto;
+  color: #FFFFFF;
+  padding: 0 20px;
+}
+
 .uk-container {
   padding: 20px 0;
 }

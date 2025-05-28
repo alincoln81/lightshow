@@ -6,11 +6,14 @@ const stopCameraBtn = document.getElementById('stop-camera-btn');
 const cameraFeed = document.getElementById('camera-feed');
 const cameraCard = document.getElementById('camera-card');
 const body = document.getElementById('body');
+const cameraCardTitle = document.getElementById('camera-card-title');
 
 let currentStream = null;
 let currentTrack = null;
 let flashlight = null;
 let pulseInterval = null;
+
+let currentAction = null;
 
 // Initialize Socket.IO
 const socket = io();
@@ -22,6 +25,14 @@ socket.on('connect', () => {
 
 socket.on('state-update', (state) => {
     console.log('USER: STATE UPDATE', state);
+    currentAction = state.action;
+    //if state.action == 'pulse' then we need to start the pulse interval
+    console.log('Current Action:', currentAction);
+
+    //if currentAction == 'pulse' then we need to start the pulse interval
+    if (currentAction == 'pulse') {
+        startPulseInterval();
+    }
 });
 
 socket.on('disconnect', () => {
@@ -43,89 +54,26 @@ socket.on('strobe-user', (dataPoint) => {
             });
         }
     } else {
-        //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
     }
 });
 
 socket.on('pulse-user', () => {
-    let brightness = 0;
-    let torchState = true;
-    //Set an interval to pulse the flashlight and camera border on and off every 400ms
-    pulseInterval = setInterval(() => {
-        
-
-        if (flashlight && currentTrack) {
-            try {
-                const capabilities = currentTrack.getCapabilities();
-                if (capabilities.torchLevel) {
-                    currentTrack.applyConstraints({
-                        advanced: [
-                            {torch: torchState},
-                            {torchLevel: brightness}  // Value between 0.0 and 1.0
-                        ]
-                    });
-                } else {
-                    // Fallback to basic torch control if brightness control is not supported
-                    currentTrack.applyConstraints({
-                        advanced: [{torch: torchState}]
-                    });
-                }
-            } catch (error) {
-                console.warn('Error setting torch brightness:', error);
-                // Fallback to basic torch control
-                currentTrack.applyConstraints({
-                    advanced: [{torch: torchState}]
-                });
-            }
-        } else {
-            //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
-            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
-        }
-
-
-        
-        if (torchState == true) {
-            
-            console.log('USER: PULSE INTERVAL',  
-                'torchState:', torchState, 
-                'brightness:', brightness
-            );
-
-            brightness += 0.025;
-
-            if (brightness > 1) {
-                brightness = 1;
-                torchState = false;
-            }
-
-        } else if (torchState == false) {
-            console.log('USER: PULSE INTERVAL',  
-                'torchState:', torchState, 
-                'brightness:', brightness
-            );
-
-            brightness -= 0.025;
-
-            if (brightness < 0) {
-                brightness = 0;
-                torchState = true;
-            }
-        }
-    }, 50);
+    startPulseInterval();
 });
 
 socket.on('stop-light-show', () => {
     //console.log('USER: STOPPING LIGHT SHOW');
-    //cameraCard.style.backgroundColor = 'rgba(255, 255, 255, 0)';
     body.style.backgroundColor = '#1b1b1b';
     if (pulseInterval) {
         clearInterval(pulseInterval);
     }
+    cameraCardTitle.style.display = 'none';
 });
 
 // Camera and flashlight handling
 async function startCameraAndFlashlight() {
+
     try {
         // Request camera and flashlight permissions
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -180,6 +128,7 @@ async function startCameraAndFlashlight() {
         // Update button states
         startCameraBtn.style.display = 'none';
         stopCameraBtn.style.display = 'inline-block';
+        cameraCardTitle.style.display = 'none';
 
     } catch (error) {
         if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
@@ -188,6 +137,7 @@ async function startCameraAndFlashlight() {
             console.warn('Error accessing camera:', error);
         }
     }
+    socket.emit('get-state');
 }
 
 function stopCameraAndFlashlight() {
@@ -201,12 +151,85 @@ function stopCameraAndFlashlight() {
         socket.emit('flashlight-disconnect');
     }
 
+    if (pulseInterval) {
+        clearInterval(pulseInterval);
+    }
+
+    if (currentAction == 'pulse') {
+        cameraCardTitle.style.display = 'block';
+    } else {
+        cameraCardTitle.style.display = 'none';
+    }
+    body.style.backgroundColor = '#1b1b1b';
     // Clear video source
     cameraFeed.srcObject = null;
 
     // Reset button states
     startCameraBtn.style.display = 'inline-block';
     stopCameraBtn.style.display = 'none';
+}
+
+function startPulseInterval() {
+    console.log('USER: STARTING PULSE INTERVAL');
+
+    let brightness = 0;
+    let bgOn = true; //for the phone background
+    let torchOn = true; //for the actual torch
+
+    if (currentTrack == null) {
+        cameraCardTitle.style.display = 'block';
+    } else {
+        cameraCardTitle.style.display = 'none';
+    }
+
+    //Set an interval to pulse the flashlight and camera border on and off every 400ms
+    if (flashlight && currentTrack) {
+        pulseInterval = setInterval(() => {
+            currentTrack.applyConstraints({
+                advanced: [{torch: torchOn}]
+            });
+            if (torchOn) {
+                torchOn = false;
+            } else {
+                torchOn = true;
+            }
+        }, 3000);
+
+    } else if (!flashlight && currentTrack) {
+        pulseInterval = setInterval(() => {
+            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+
+            if (bgOn == true) {
+                
+                console.log('USER: PULSE INTERVAL',  
+                    'bgOn:', bgOn, 
+                    'brightness:', brightness
+                );
+
+                brightness += 0.025;
+
+                if (brightness > 1) {
+                    brightness = 1;
+                    bgOn = false;
+                }
+
+            } else if (bgOn == false) {
+                console.log('USER: PULSE INTERVAL',  
+                    'bgOn:', bgOn, 
+                    'brightness:', brightness
+                );
+
+                brightness -= 0.025;
+
+                if (brightness < 0) {
+                    brightness = 0;
+                    bgOn = true;
+                }
+            }
+        }, 50);
+    } else {
+        console.log('USER: NO FLASHLIGHT OR TRACK');
+    }
 }
 
 // Button handlers
