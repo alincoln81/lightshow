@@ -1,0 +1,27 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    # Phase 1 ─ ramp-up: 100 VU/s = 10 VU/100 ms
+    - name: "ramp-up"
+      arrivalRate: 100        # users per second
+      maxVusers: 1000         # stop when we hit 1 000
+      duration: 10            # 1000 ÷ 100 = 10 s
+
+  engines:
+    socketio: {}              # use Socket.IO transport
+  #processor: "./processor.js" # adds a custom function (see next file)
+
+scenarios:
+  - engine: socketio
+    flow:
+      # 1. open socket and emit the 'user-connect' event
+      - emit:
+          channel: "user-connect"
+          data:
+            msg: "hello"
+
+      # 2. keep the socket alive for the 60-s steady period
+      - think: 120
+
+      # 3. extra stagger so only 100 users finish every 100 ms
+      #- function: staggerDisconnect
