@@ -138,6 +138,21 @@ function _listenToCameraPermissionChanges(callbackAsync) {
             })
     } catch (ex2) {
         console.error("Cannot use permisisons api", ex2)
+        var fallback_attempts = 0;
+        const max_attempts = 10;
+        let interval = setInterval(() => {
+            fallback_attempts++;
+            if (fallback_attempts === max_attempts) {
+                callbackAsync?.call(2).catch((ex) => {
+                    console.error("Failed with permission - no torch - will retry", ex);
+                });
+                clearInterval(interval);
+            } else {
+                callbackAsync?.call(1).catch((ex) => {
+                    console.error("Failed with permission - no torch", ex);
+                });
+            }
+        }, 500);
     }
 }
 
