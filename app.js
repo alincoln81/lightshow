@@ -4,7 +4,7 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
-const DEBUG_MODE_ENABLED = true;
+const DEBUG_MODE_ENABLED = false;
 
 
 // Serve static files from the public directory

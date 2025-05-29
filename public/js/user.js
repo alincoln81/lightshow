@@ -53,7 +53,7 @@ socket.on('start-light-show', (dataPoint) => {
                 });
             }
         } else {
-            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+            //body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
     } else {
         //if the user is not participating in the light show, do nothing
@@ -87,7 +87,7 @@ socket.on('pause-light-show', () => {
                 advanced: [{ torch: false }]
             });
         }
-        body.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+        //body.style.backgroundColor = 'rgba(255, 255, 255, 0)';
     } else {
         //if the user is not participating in the light show, do nothing
     }
@@ -249,7 +249,7 @@ function stopCameraAndFlashlight() {
         socket.emit('flashlight-disconnect');
     }
 
-    body.style.backgroundColor = '#1b1b1b';
+    //body.style.backgroundColor = '#1b1b1b';
     cameraFeed.srcObject = null;
     flashlight = null;
     // Reset button states
