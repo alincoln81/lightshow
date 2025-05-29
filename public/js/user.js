@@ -102,7 +102,7 @@ async function _startCamera(cameras) {
     const has_torch = track.getCapabilities().torch
     if (!has_torch) {
         track.stop()
-        return await flashlightHandler._startCamera(cameras)
+        return await _startCamera(cameras)
     }
     return {stream, track}
 }
@@ -125,7 +125,7 @@ function _listenToCameraPermissionChanges(callbackAsync) {
                     // Give the device half a second - before we request another track.
                     setTimeout(() => {
                     // Abort if the track was good.
-                    if (flashlightHandler.track) return
+                    if (currentTrack) return
                     if (requesting_camera) {
                         callbackAsync?.call(2).catch((ex) => {
                         console.error("Failed with permission - no torch", ex);
