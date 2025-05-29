@@ -113,28 +113,32 @@ function _listenToCameraPermissionChanges(callbackAsync) {
     listening_to_camera_permissions = true;
 
     // Listen.
-    navigator.permissions
-        .query({ name: "camera" })
-        .then((permissionStatus) => {
-            console.log(`camera permission state is ${permissionStatus.state}`)
-            permissionStatus.onchange = () => {
-                console.log(
-                    `camera permission state has changed to ${permissionStatus.state === "granted"}`,
-                )
-                if (permissionStatus.state.toString() === "granted") {
-                    // Give the device half a second - before we request another track.
-                    setTimeout(() => {
-                    // Abort if the track was good.
-                    if (currentTrack) return
-                    if (requesting_camera) {
-                        callbackAsync?.call(2).catch((ex) => {
-                        console.error("Failed with permission - no torch", ex);
-                        });
+    try {
+        navigator.permissions
+            .query({ name: "camera" })
+            .then((permissionStatus) => {
+                console.log(`camera permission state is ${permissionStatus.state}`)
+                permissionStatus.onchange = () => {
+                    console.log(
+                        `camera permission state has changed to ${permissionStatus.state === "granted"}`,
+                    )
+                    if (permissionStatus.state.toString() === "granted") {
+                        // Give the device half a second - before we request another track.
+                        setTimeout(() => {
+                        // Abort if the track was good.
+                        if (currentTrack) return
+                        if (requesting_camera) {
+                            callbackAsync?.call(2).catch((ex) => {
+                            console.error("Failed with permission - no torch", ex);
+                            });
+                        }
+                        }, 500)
                     }
-                    }, 500)
                 }
-            }
-        })
+            })
+    } catch (ex2) {
+        console.error("Cannot use permisisons api", ex2)
+    }
 }
 
 
