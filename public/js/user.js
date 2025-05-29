@@ -152,7 +152,7 @@ async function _startCameraAndFlashlight(attemptCount) {
         currentTrack = success.track;
 
         // Set up camera feed
-        cameraFeed.srcObject = stream;
+        cameraFeed.srcObject = success.stream;
 
         // Try to enable flashlight
         try {
