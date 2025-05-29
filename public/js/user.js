@@ -69,7 +69,7 @@ socket.on('stop-light-show', () => {
     } else {
         console.log('USER: NO REDIRECT URL');
         //redirect to home page
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 });
 
@@ -170,7 +170,7 @@ function stopCameraAndFlashlight() {
     infoText.innerHTML = '';
     
     //redirect to home page
-    window.location.href = '/';
+    //window.location.href = '/';
 }
 // ===================================================================================================================================================
 // UI update
