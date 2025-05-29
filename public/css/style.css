@@ -210,4 +210,23 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #1b1b1b;
 }
 
+@media (max-width: 450px) {
+  #logo-container img {
+    width: 70px;
+    height: 70px;
+  }
+  #logo-container h1 {
+    font-size: 50px;
+  }
+}
+@media (max-width: 350px) {
+  #logo-container img {
+    width: 60px;
+    height: 60px;
+  }
+  #logo-container h1 {
+    font-size: 40px;
+  }
+}
+
 /*# sourceMappingURL=style.css.map */

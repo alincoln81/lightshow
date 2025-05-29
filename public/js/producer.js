@@ -3,7 +3,7 @@ const startLightShowBtn = document.getElementById('start-light-show-btn');
 const stopLightShowBtn = document.getElementById('stop-light-show-btn');
 const pauseLightShowBtn = document.getElementById('pause-light-show-btn');
 const start = document.getElementById('start');
-const stop = document.getElementById('stop');
+const stopContainer = document.getElementById('stop-container');
 const pause = document.getElementById('pause');
 let flashInterval;
 let lightShowActive = false;
@@ -39,11 +39,54 @@ socket.on('producer-error', (message) => {
 socket.on('user-count-update', (count) => {
     document.getElementById('user-count').innerHTML = count;
     document.getElementById('last-updated').innerHTML = new Date().toLocaleString();
+    console.log('User count updated: ' + count);
 });
 
 socket.on('flashlight-count-update', (count) => {
     document.getElementById('flashlight-count').innerHTML = count;
     document.getElementById('last-updated').innerHTML = new Date().toLocaleString();
+    console.log('Flashlight count updated: ' + count);
+});
+
+socket.on('redirect-url', (url) => {
+    console.log('Redirect URL updated: ' + url);
+    document.getElementById('redirect-url').value = url;
+});
+
+socket.on('light-show-mode', (lightShowData) => {
+    console.log('Light show mode updated: ' + lightShowData.showMode);
+    console.log('Light show active: ' + lightShowData.showActive);
+    
+    //set the light show mode
+    document.getElementById('light-show-mode').value = lightShowData.showMode;
+
+    if (lightShowData.showActive === 'active') {
+        startLightShowBtn.style.display = 'none';
+        start.style.display = 'none';
+        stopLightShowBtn.style.display = 'block';
+        stopContainer.style.display = 'block';
+        pauseLightShowBtn.style.display = 'block';
+        pause.style.display = 'block';
+        lightShowActive = true;
+    } else if (lightShowData.showActive === 'inactive') {
+        startLightShowBtn.style.display = 'block';
+        start.style.display = 'block';
+        stopLightShowBtn.style.display = 'none';
+        stopContainer.style.display = 'none';
+        pauseLightShowBtn.style.display = 'none';
+        pause.style.display = 'none';
+        lightShowActive = false;
+    } else if (lightShowData.showActive === 'paused') {
+        startLightShowBtn.style.display = 'block';
+        start.style.display = 'block';
+        stopLightShowBtn.style.display = 'none';
+        stopContainer.style.display = 'none';
+        pauseLightShowBtn.style.display = 'none';
+        pause.style.display = 'none';
+        lightShowActive = false;
+    } else {
+        console.log('Invalid light show active status');
+    }
 });
 
 // ===================================================================================================================================================
@@ -53,7 +96,7 @@ async function startLightShow() {
     startLightShowBtn.style.display = 'none';
     start.style.display = 'none';
     stopLightShowBtn.style.display = 'block';
-    stop.style.display = 'block';
+    stopContainer.style.display = 'block';
     pauseLightShowBtn.style.display = 'block';
     pause.style.display = 'block';
     lightShowActive = true;
@@ -124,12 +167,13 @@ async function startLightShow() {
         flashInterval = setInterval(emitLightShow, lightShowInterval);
     }
 }
+
 // stop light show
 function stopLightShow() {
     startLightShowBtn.style.display = 'block';
     start.style.display = 'block';
     stopLightShowBtn.style.display = 'none';
-    stop.style.display = 'none';
+    stopContainer.style.display = 'none';
     pauseLightShowBtn.style.display = 'none';
     pause.style.display = 'none';
     clearInterval(flashInterval);
@@ -139,11 +183,10 @@ function stopLightShow() {
 
 // pause light show
 function pauseLightShow() {
-    clearInterval(flashInterval);
     startLightShowBtn.style.display = 'block';
     start.style.display = 'block';
     stopLightShowBtn.style.display = 'none';
-    stop.style.display = 'none';
+    stopContainer.style.display = 'none';
     pauseLightShowBtn.style.display = 'none';
     pause.style.display = 'none';
     clearInterval(flashInterval);
@@ -165,3 +208,11 @@ document.getElementById('light-show-mode').addEventListener('change', () => {
     }
 });
 
+//Share the redirect on blur
+document.getElementById('redirect-url').addEventListener('blur', () => {
+    const redirectUrl = document.getElementById('redirect-url').value;
+    //if the redirect url is not empty, save the redirect url
+    if (redirectUrl) {
+        socket.emit('save-redirect-url', redirectUrl);
+    }
+});
