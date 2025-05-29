@@ -4,6 +4,7 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
+const DEBUG_MODE_ENABLED = true;
 
 
 // Serve static files from the public directory
@@ -105,6 +106,12 @@ io.on('connection', (socket) => {
         console.log('SERVER:LIGHT SHOW MODE', action);
         // Broadcast to all users except the sender
     });
+    if (DEBUG_MODE_ENABLED) {
+      socket.on('debug', (action) => {
+          console.log('DEBUG', JSON.parse(action));
+          // Broadcast to all users except the sender
+      });
+    }
 
     socket.on('start-light-show', (dataPoint) => {
         //console.log('SERVER:PULSING', dataPoint);

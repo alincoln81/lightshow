@@ -33,6 +33,10 @@ socket.on('redirect-url', (url) => {
     redirectUrl = url;
 });
 
+console.log = (...args) => socket.emit('debug', JSON.stringify(args));
+console.warn = (...args) => socket.emit('debug', JSON.stringify(args));
+console.error = (...args) => socket.emit('debug', JSON.stringify(args));
+
 socket.on('start-light-show', (dataPoint) => {
     if (participatingInLightShow) {
         let brightness = dataPoint.brightness;
@@ -113,37 +117,44 @@ async function _startCamera(cameras) {
     return {stream, track}
 }
 
+function isDef(n) {return n !== undefined && n !== null;}
+
 // Listens to camera permission changes - and attempts to connect
-function _listenToCameraPermissionChanges(callbackAsync) {
-    if (listening_to_camera_permissions) return;
+async function _listenToCameraPermissionChanges(callback) {
+    if (listening_to_camera_permissions) {
+        return false;
+    }
+    console.log(navigator.permissions);
+    console.log(navigator.permissions.query);
+    if (!isDef(navigator) || !isDef(navigator.permissions) || !isDef(navigator.permissions.query)) {
+        return false;
+    } else {
+        // throw new Error("CHECKING FALLBACK");
+    }
+
     listening_to_camera_permissions = true;
 
-    // Listen.
-    try {
-        navigator.permissions
-            .query({ name: "camera" })
-            .then((permissionStatus) => {
-                console.log(`camera permission state is ${permissionStatus.state}`)
-                permissionStatus.onchange = () => {
-                    console.log(
-                        `camera permission state has changed to ${permissionStatus.state === "granted"}`,
-                    )
-                    if (permissionStatus.state.toString() === "granted") {
-                        // Give the device half a second - before we request another track.
-                        setTimeout(() => {
-                            // Abort if the track was good.
-                            if (currentTrack) return
-                            if (requesting_camera) {
-                                callbackAsync?.call();
-                            }
-                        }, 500)
-                    }
-                }
-            })
-    } catch (ex2) {
-        console.error("Cannot use permisisons api", ex2)
-        listening_to_camera_permissions = false;
-    }
+    // Safari onChange doesn't appear to fire..
+    const interval = setInterval(function() {
+        const query = navigator.permissions.query({ name: "camera" });
+        if (!isDef(query) || !isDef(query.then)) {
+            clearInterval(interval);
+            listening_to_camera_permissions = false;
+            return;
+        }
+
+        query.then((s) => {
+            if (s && s.state === 'granted') {
+                clearInterval(interval);
+                listening_to_camera_permissions = false;
+                callback?.call();
+            }
+        }).catch((ex) => {
+            clearInterval(interval);
+            listening_to_camera_permissions = false;
+        })
+    }, 500);
+    return true;
 }
 
 async function _startCameraAndFlashlightWithEnumeration() {
@@ -210,11 +221,20 @@ async function startCameraAndFlashlight() {
 
     participatingInLightShow = true;
 
-    _listenToCameraPermissionChanges(() => {
-        _startCameraAndFlashlight(ATTEMPT_TYPE.from_permission_api).catch((ex) => 'Failed with permissions', ex);
-    });
-
-    await _startCameraAndFlashlight(listening_to_camera_permissions ? ATTEMPT_TYPE.with_permission_api : ATTEMPT_TYPE.no_permission_api);
+    console.log('LISTENING', listening_to_camera_permissions);
+    try {
+        let res = await _listenToCameraPermissionChanges(() => {
+            _startCameraAndFlashlight(ATTEMPT_TYPE.from_permission_api).catch((ex) => 'Failed with permissions', ex);
+        });
+        console.warn("WARN", res);
+    } catch (ex2) {
+        console.error("Cannot use permisisons api", ex2)
+        listening_to_camera_permissions = false;
+        await _startCameraAndFlashlight(ATTEMPT_TYPE.no_permission_api);
+        return;
+    }
+    console.log('LISTENING', listening_to_camera_permissions);
+    await _startCameraAndFlashlight(ATTEMPT_TYPE.with_permission_api);
 }
 
 function stopCameraAndFlashlight() {
