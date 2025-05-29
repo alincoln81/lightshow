@@ -71,7 +71,7 @@ async function startLightShow() {
         lightShowInterval = 2000;
         action = 'slow-strobe';
     } else if (lightShowMode === 'twinkle') {
-        lightShowInterval = 3700;
+        lightShowInterval = 4500;
         action = 'twinkle';
     } else if (lightShowMode === 'pulse') {
         lightShowInterval = 6000;
@@ -95,24 +95,15 @@ async function startLightShow() {
         // Complex twinkle pattern sequence
         const twinkle = () => {
             socket.emit('start-light-show', {brightness: 1, action: action});
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 0, action: action});
-            }, 700);
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 1, action: action});
-            }, 1200);
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 0, action: action});
-            }, 1400);
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 1, action: action});
-            }, 2300);
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 0, action: action});
-            }, 3100);
-            setTimeout(() => {
-                socket.emit('start-light-show', {brightness: 1, action: action});
-            }, 3400);  
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 0, action: action});}, 700);
+
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 1, action: action});}, 1200);
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 0, action: action});}, 1700);
+
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 1, action: action});}, 2700);
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 0, action: action});}, 3100);
+
+            setTimeout(() => {socket.emit('start-light-show', {brightness: 1, action: action});}, 3700);  
         }
 
         twinkle();

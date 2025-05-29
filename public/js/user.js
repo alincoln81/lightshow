@@ -48,7 +48,7 @@ socket.on('start-light-show', (dataPoint) => {
                 });
             }
         } else {
-            //body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
     } else {
     }
@@ -79,13 +79,13 @@ socket.on('pause-light-show', () => {
 async function startCameraAndFlashlight() {
     participatingInLightShow = true;
     try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter((device) => device.kind === 'videoinput');
+        if (cameras.length === 0) throw new Error("CRAP");
         // Request camera and flashlight permissions
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: 'environment',
-                advanced: [{
-                    torch: true
-                }]
+                deviceId: cameras.pop()?.deviceId,
             }
         });
         // Store the stream and track for later use
@@ -115,7 +115,7 @@ async function startCameraAndFlashlight() {
         // Try to enable flashlight
         try {
             await currentTrack.applyConstraints({
-                advanced: [{torch: false},]
+                 advanced: [{torch: false}]
             });
             socket.emit('flashlight-connect');
             updateUI('success');
