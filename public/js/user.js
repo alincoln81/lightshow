@@ -51,6 +51,7 @@ socket.on('start-light-show', (dataPoint) => {
             body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
     } else {
+        //if the user is not participating in the light show, do nothing
     }
 });
 
@@ -67,11 +68,24 @@ socket.on('stop-light-show', () => {
         window.location.href = redirectUrlWithProtocol;
     } else {
         console.log('USER: NO REDIRECT URL');
+        //redirect to home page
+        window.location.href = '/';
     }
 });
 
 socket.on('pause-light-show', () => {
     console.log('USER: PRODUCER PAUSED LIGHT SHOW');
+    if (participatingInLightShow) {
+        //if we have access to the flashlight, adjust the brightness otherwise just use the border color
+        if (flashlight && currentTrack) {
+            currentTrack.applyConstraints({
+                advanced: [{ torch: false }]
+            });
+        }
+        body.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+    } else {
+        //if the user is not participating in the light show, do nothing
+    }
 });
 
 // ===================================================================================================================================================
@@ -153,6 +167,10 @@ function stopCameraAndFlashlight() {
     // Reset button states
     startCameraBtn.style.display = 'inline-block';
     stopCameraBtn.style.display = 'none';
+    infoText.innerHTML = '';
+    
+    //redirect to home page
+    window.location.href = '/';
 }
 // ===================================================================================================================================================
 // UI update
