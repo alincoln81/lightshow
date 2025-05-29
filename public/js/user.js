@@ -17,6 +17,12 @@ let flashlight = null;
 let participatingInLightShow = false;
 let redirectUrl = null;
 
+const ATTEMPT_TYPE = {
+    no_permission_api: 'no_permission_api',
+    with_permission_api: 'with_permission_api',
+    from_permission_api: 'from_permission_api',
+}
+
 // ===================================================================================================================================================
 // Socket event handlers
 socket.on('connect', () => {
@@ -125,46 +131,38 @@ function _listenToCameraPermissionChanges(callbackAsync) {
                     if (permissionStatus.state.toString() === "granted") {
                         // Give the device half a second - before we request another track.
                         setTimeout(() => {
-                        // Abort if the track was good.
-                        if (currentTrack) return
-                        if (requesting_camera) {
-                            callbackAsync?.call(2).catch((ex) => {
-                            console.error("Failed with permission - no torch", ex);
-                            });
-                        }
+                            // Abort if the track was good.
+                            if (currentTrack) return
+                            if (requesting_camera) {
+                                callbackAsync?.call();
+                            }
                         }, 500)
                     }
                 }
             })
     } catch (ex2) {
         console.error("Cannot use permisisons api", ex2)
-        var fallback_attempts = 0;
-        const max_attempts = 10;
-        let interval = setInterval(() => {
-            fallback_attempts++;
-            if (fallback_attempts === max_attempts) {
-                callbackAsync?.call(2).catch((ex) => {
-                    console.error("Failed with permission - no torch - will retry", ex);
-                });
-                clearInterval(interval);
-            } else {
-                callbackAsync?.call(1).then(() => {
-                    clearInterval(interval);
-                }).catch((ex) => {
-                    console.error("Failed with permission - no torch", ex);
-                });
-            }
-        }, 500);
+        listening_to_camera_permissions = false;
     }
 }
 
+async function _startCameraAndFlashlightWithEnumeration() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter((device) => device.kind === 'videoinput');
 
-async function _startCameraAndFlashlight(attemptCount) {
+    return await _startCamera(cameras);
+}
+
+async function _startCameraAndFlashlight(attemptType) {
     try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const cameras = devices.filter((device) => device.kind === 'videoinput');
-
-        const success = await _startCamera(cameras);
+        let success;
+        if (attemptType === ATTEMPT_TYPE.no_permission_api) {
+            const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment', advanced: [{torch: true}]}});
+            const track = stream.getVideoTracks()[0];
+            success = {stream, track};
+        } else {
+            success = await _startCameraAndFlashlightWithEnumeration();
+        }
 
         if (!success || !success.stream || !success.track) throw new Error("No dice");
 
@@ -185,7 +183,7 @@ async function _startCameraAndFlashlight(attemptCount) {
             requesting_camera = false;
         } catch (error) {
             console.warn('Flashlight not found:', error);
-            if (attemptCount !== 1) {
+            if (attemptType !== ATTEMPT_TYPE.with_permission_api) {
                 updateUI('flashlight-failed');
             }
         }
@@ -196,12 +194,12 @@ async function _startCameraAndFlashlight(attemptCount) {
         } else {
             console.warn('Error accessing camera:', error);
         }
-        if (attemptCount !== 1) {
+        if (attemptType !== ATTEMPT_TYPE.with_permission_api) {
             updateUI('camera-failed');
         }
     }
 
-    if (attemptCount !== 1) {
+    if (attemptType !== ATTEMPT_TYPE.with_permission_api) {
         requesting_camera = false;
     }
 }
@@ -211,8 +209,12 @@ async function startCameraAndFlashlight() {
     requesting_camera = true;
 
     participatingInLightShow = true;
-    _listenToCameraPermissionChanges(_startCameraAndFlashlight)
-    await _startCameraAndFlashlight(1);
+
+    _listenToCameraPermissionChanges(() => {
+        _startCameraAndFlashlight(ATTEMPT_TYPE.from_permission_api).catch((ex) => 'Failed with permissions', ex);
+    });
+
+    await _startCameraAndFlashlight(listening_to_camera_permissions ? ATTEMPT_TYPE.with_permission_api : ATTEMPT_TYPE.no_permission_api);
 }
 
 function stopCameraAndFlashlight() {
