@@ -148,7 +148,9 @@ function _listenToCameraPermissionChanges(callbackAsync) {
                 });
                 clearInterval(interval);
             } else {
-                callbackAsync?.call(1).catch((ex) => {
+                callbackAsync?.call(1).then(() => {
+                    clearInterval(interval);
+                }).catch((ex) => {
                     console.error("Failed with permission - no torch", ex);
                 });
             }
