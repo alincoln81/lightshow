@@ -63,33 +63,75 @@ async function startLightShow() {
     
     //set the light show interval based on the light show mode
     let lightShowInterval;
-    if (lightShowMode === 'strobe') {
+    let action;
+    if (lightShowMode === 'fast-strobe') {
         lightShowInterval = 100;
+        action = 'fast-strobe';
+    } else if (lightShowMode === 'slow-strobe') {
+        lightShowInterval = 2000;
+        action = 'slow-strobe';
+    } else if (lightShowMode === 'twinkle') {
+        lightShowInterval = 3700;
+        action = 'twinkle';
     } else if (lightShowMode === 'pulse') {
         lightShowInterval = 6000;
+        action = 'pulse';
     } else {
         //if the light show mode is not valid, return
         console.log('Invalid light show mode');
         return;
     }
 
-    // Function to emit the light show events
-    const emitLightShow = () => {
-        socket.emit('start-light-show', {brightness: 1, action: 'pulse'});
-        setTimeout(() => {
-            socket.emit('start-light-show', {brightness: 0, action: 'pulse'});
-        }, lightShowInterval/2);
-    };
-
-    // Emit immediately
-    emitLightShow();
-    
-    // Then set up the interval for subsequent emissions
-    flashInterval = setInterval(emitLightShow, lightShowInterval);
+    //share the light show mode
+    socket.emit('send-light-show-mode', (action));
     
     //share the redirect url
     const redirectUrl = document.getElementById('redirect-url').value;
-    socket.emit('save-redirect-url', redirectUrl);
+    if (redirectUrl) {
+        socket.emit('save-redirect-url', redirectUrl);
+    }
+
+    if (lightShowMode === 'twinkle') {
+        // Complex twinkle pattern sequence
+        const twinkle = () => {
+            socket.emit('start-light-show', {brightness: 1, action: action});
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 0, action: action});
+            }, 700);
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 1, action: action});
+            }, 1200);
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 0, action: action});
+            }, 1400);
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 1, action: action});
+            }, 2300);
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 0, action: action});
+            }, 3100);
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 1, action: action});
+            }, 3400);  
+        }
+
+        twinkle();
+        flashInterval = setInterval(twinkle, lightShowInterval);
+    } else {
+        // Function to emit the light show events
+        const emitLightShow = () => {
+            socket.emit('start-light-show', {brightness: 1, action: action});
+            setTimeout(() => {
+                socket.emit('start-light-show', {brightness: 0, action: action});
+            }, lightShowInterval/2);
+        };
+
+        // Emit immediately
+        emitLightShow();
+        
+        // Then set up the interval for subsequent emissions
+        flashInterval = setInterval(emitLightShow, lightShowInterval);
+    }
 }
 // stop light show
 function stopLightShow() {

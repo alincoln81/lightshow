@@ -6,6 +6,7 @@ const startCameraBtn = document.getElementById('start-camera-btn'); //to start t
 const stopCameraBtn = document.getElementById('stop-camera-btn'); //to stop the camera and flashlight
 const cameraFeed = document.getElementById('camera-feed'); //for the camera feed
 const body = document.getElementById('body'); //for the background color
+const infoText = document.getElementById('info-text'); //to indicate when the show has started
 // Initialize Socket.IO
 const socket = io();
 
@@ -47,7 +48,7 @@ socket.on('start-light-show', (dataPoint) => {
                 });
             }
         } else {
-            body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
+            //body.style.backgroundColor = 'rgba(255, 255, 255, ' + brightness + ')';
         }
     } else {
     }
@@ -103,6 +104,8 @@ async function startCameraAndFlashlight() {
           } else {
             // This just ain't gonna work
             // TODO: - something different.
+            updateUI('flashlight-failed');
+            startCameraBtn.innerText = 'Join Light Show';
           }
         }
 
@@ -155,13 +158,16 @@ function stopCameraAndFlashlight() {
 // UI update
 function updateUI(state) {
     
-    startCameraBtn.style.display = 'none';
-    stopCameraBtn.style.display = 'inline-block';
-
     if (state == 'success') {
         flashlight = true;
+        infoText.innerHTML = '';
+        startCameraBtn.style.display = 'none';
+        stopCameraBtn.style.display = 'inline-block';
     } else if (state == 'camera-failed' || state == 'flashlight-failed') {
         flashlight = false;
+        infoText.innerHTML = 'Failed to connect the flashlight, please try again.';
+        startCameraBtn.style.display = 'inline-block';
+        stopCameraBtn.style.display = 'none';
     }
 }
 // ===================================================================================================================================================

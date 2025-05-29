@@ -5,6 +5,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
+
 // Serve static files from the public directory
 app.use(express.static('public'));
 
@@ -58,7 +59,7 @@ io.on('connection', (socket) => {
         if (producerSocket) {
             producerSocket.emit('user-count-update', connectedUsers.size);
         }
-        //console.log('User connected. Total users:', connectedUsers.size);
+        console.log('User connected. Total users:', connectedUsers.size);
     });
 
     // Handle disconnection
@@ -72,14 +73,14 @@ io.on('connection', (socket) => {
             if (producerSocket) {
                 producerSocket.emit('user-count-update', connectedUsers.size);
             }
-            //console.log('User disconnected. Total users:', connectedUsers.size);
+            console.log('User disconnected. Total users:', connectedUsers.size);
         }
         if (connectedFlashlights.has(socket.id)) {
             connectedFlashlights.delete(socket.id);
             if (producerSocket) {
                 producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
             }
-            //console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
+            console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
         }
     });
 
@@ -88,6 +89,7 @@ io.on('connection', (socket) => {
         if (producerSocket) {
             producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
         }
+        console.log('Flashlight connected. Total flashlights:', connectedFlashlights.size);
     });
 
     socket.on('flashlight-disconnect', () => {
@@ -95,6 +97,13 @@ io.on('connection', (socket) => {
         if (producerSocket) {
             producerSocket.emit('flashlight-count-update', connectedFlashlights.size);
         }
+        console.log('Flashlight disconnected. Total flashlights:', connectedFlashlights.size);
+    });
+
+
+    socket.on('send-light-show-mode', (action) => {
+        console.log('SERVER:LIGHT SHOW MODE', action);
+        // Broadcast to all users except the sender
     });
 
     socket.on('start-light-show', (dataPoint) => {
